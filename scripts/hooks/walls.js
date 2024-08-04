@@ -2,7 +2,7 @@ import WallHelpers from "../wall-helpers";
 
 export default function() 
 {
-    if(game.settings.get('impmal-cover-walls','debug')){
+    //if(game.settings.get('impmal-cover-walls','debug')){
         Hooks.on("hoverWall", async (wall, hover) => 
         {
             let positions = WallHelpers._getAdjacentWallGridOffsets(wall);
@@ -17,10 +17,12 @@ export default function()
                 canvas.interface.grid.destroyHighlightLayer("impmal-cover-walls.WallProximity");
             }
         });
-    }  
+    //}  
     
     Hooks.on("renderWallConfig", async (app, [html], style) => 
     {
+        //if(game.settings.get('impmal-cover-walls','debug'))
+        console.log(html);
         const traits = app.document.flags?.impmal?.traits ?? {cover:'', barrier: false}
         let extra_html = `
         <div class="form-group">

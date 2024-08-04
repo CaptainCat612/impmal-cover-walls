@@ -1,7 +1,5 @@
 import registerHooks from "./scripts/hooks";
 
-registerHooks();
-
 Hooks.on("init", () => {
     game.settings.register('impmal-cover-walls', 'debug', {
         name: 'IMPMAL-COVER-WALLS.SETTINGS.debug',
@@ -9,6 +7,8 @@ Hooks.on("init", () => {
         scope: 'world',
         config: true,
         type: Boolean,
-        default: false
+        default: true
     });
 });
+
+registerHooks();
