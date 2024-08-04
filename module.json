@@ -13,8 +13,14 @@
         "minimum": 11,
         "verified": 11
     },
-    "scripts": ["scripts/"],
     "esmodules": ["./cover-walls.js"],
+    "languages": [
+      {
+        "lang": "en",
+        "name": "English",
+        "path": "lang/en.json"
+      }
+    ],
     "system": ["impmal"],
     "relationships": {
     "systems": [{

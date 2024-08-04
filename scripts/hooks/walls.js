@@ -2,20 +2,22 @@ import WallHelpers from "../wall-helpers";
 
 export default function() 
 {
-    Hooks.on("hoverWall", async (wall, hover) => 
-    {
-        let positions = WallHelpers._getAdjacentWallGridOffsets(wall);
-        if(hover)
+    if(game.settings.get('impmal-cover-walls','debug')){
+        Hooks.on("hoverWall", async (wall, hover) => 
         {
-            positions.forEach(p => {
-                canvas.interface.grid.highlightPosition("impmal-cover-walls.WallProximity", { x:p[0], y:p[1] });
-            });
-        }
-        else
-        {
-            canvas.interface.grid.destroyHighlightLayer("impmal-cover-walls.WallProximity");
-        }
-    });
+            let positions = WallHelpers._getAdjacentWallGridOffsets(wall);
+            if(hover)
+            {
+                positions.forEach(p => {
+                    canvas.interface.grid.highlightPosition("impmal-cover-walls.WallProximity", { x:p[0], y:p[1] });
+                });
+            }
+            else
+            {
+                canvas.interface.grid.destroyHighlightLayer("impmal-cover-walls.WallProximity");
+            }
+        });
+    }  
     
     Hooks.on("renderWallConfig", async (app, [html], style) => 
     {
