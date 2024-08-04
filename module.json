@@ -13,7 +13,7 @@
       "minimum": 11,
       "verified": 11
   },
-  "esmodules": ["cover-walls.js"],
+  "esmodules": ["./cover-walls.js"],
   "languages": [
     {
       "lang": "en",
