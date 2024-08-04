@@ -16,7 +16,7 @@ export default class WallHelpers
             console.log(on);
             console.log(layername);
         }
-        
+
         let positions = WallHelpers._getAdjacentWallGridOffsets(wall);
 
         if(on)
@@ -33,7 +33,7 @@ export default class WallHelpers
     
     static _getAdjacentWallGridOffsets(wall)
     {
-        if (!(drawing instanceof Wall))
+        if (drawing.document.documentName != "Wall")
             return [];
         
         if(game.settings.get('impmal-cover-walls','debug')){
@@ -109,7 +109,7 @@ export default class WallHelpers
             let left = [];
             for (let drawing of drawings)
             {
-                if (!(drawing instanceof Wall) || !drawing.document.flags?.impmal?.traits)
+                if (drawing.document.documentName != "Wall" || !drawing.document.flags?.impmal?.traits)
                     continue;
 
                 const adjacent_points = this._getAdjacentWallGridOffsets(drawing);
