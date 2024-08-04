@@ -1,5 +1,5 @@
-import token from "./hooks/token";
-import walls from "./hooks/walls";
+import token from "./hooks/token.js";
+import walls from "./hooks/walls.js";
 
 export default function() 
 {

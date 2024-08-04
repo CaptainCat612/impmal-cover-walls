@@ -1,4 +1,4 @@
-import registerHooks from "./scripts/hooks";
+import registerHooks from "./scripts/hooks.js";
 
 Hooks.on("init", () => {
     game.settings.register('impmal-cover-walls', 'debug', {

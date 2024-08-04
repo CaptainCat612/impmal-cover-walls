@@ -1,4 +1,4 @@
-import WallHelpers from "../wall-helpers";
+import WallHelpers from "../wall-helpers.js";
 
 export default function() 
 {

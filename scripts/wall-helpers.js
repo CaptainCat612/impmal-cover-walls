@@ -1,4 +1,4 @@
-import ZoneHelpers from "../../impmal/src/system/zone-helpers"
+import ZoneHelpers from "../../impmal/impmal.js"
 
 export default class WallHelpers 
 {
