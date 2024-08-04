@@ -1,4 +1,6 @@
 {
     "IMPMAL-COVER-WALLS.SETTINGS.debug": "Debug",
-    "IMPMAL-COVER-WALLS.SETTINGS.debugHint": "The Debug Flag enables Highlighting of wall areas for debugging."
+    "IMPMAL-COVER-WALLS.SETTINGS.debugHint": "The Debug Flag enables logging for debugging.",
+    "IMPMAL-COVER-WALLS.SETTINGS.highlight": "Highlights",
+    "IMPMAL-COVER-WALLS.SETTINGS.highlightHint": "The Highlight Flag enables Highlighting of wall areas when the walls are selected or hovered over."
 }

@@ -9,6 +9,15 @@ Hooks.on("init", () => {
         type: Boolean,
         default: true
     });
+    
+    game.settings.register('impmal-cover-walls', 'highlight', {
+        name: 'IMPMAL-COVER-WALLS.SETTINGS.highlight',
+        hint: 'IMPMAL-COVER-WALLS.SETTINGS.highlightHint',
+        scope: 'world',
+        config: true,
+        type: Boolean,
+        default: true
+    });
 });
 
 registerHooks();
