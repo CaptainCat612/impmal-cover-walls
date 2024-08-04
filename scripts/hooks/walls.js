@@ -38,6 +38,6 @@ export default function()
                 </select>
             </div>
         </div>`;
-        html.querySelector('.form-footer ').insertAdjacentHTML('beforebegin', extra_html)
+        html.querySelector('.form-footer ').insertAdjacentHTML('beforebegin', extra_html);
     });
 }
