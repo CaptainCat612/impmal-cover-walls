@@ -1,0 +1,29 @@
+{
+    "id": "impmal-cover-walls",
+    "title": "Imperium Maledictum - Cover Walls",
+    "description": "Simple module for FoundryVTT Imperium Maledictum system to add Cover functionality to walls.",
+    "authors": [
+        {
+            "name": "Captain Cat",
+            "email": "captaincat612@gmail.com"
+        }
+    ],
+    "version": "1.0.0",
+    "compatibility":{
+        "minimum": 11,
+        "verified": 11
+    },
+    "scripts": ["scripts/"],
+    "esmodules": ["./cover-walls.js"],
+    "system": ["impmal"],
+    "relationships": {
+    "systems": [{
+      "id": "impmal",
+      "type": "system",
+      "manifest": "https://github.com/moo-man/ImpMal-FoundryVTT/releases/latest/download/system.json",
+      "compatibility": {
+        "verified": "1.3.0"
+      }
+    }]
+  }
+}
