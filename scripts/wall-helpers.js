@@ -1,11 +1,7 @@
 export default class WallHelpers 
 {
-    static _getTopLeftPoint(p){        
-        //const coords = canvas.grid.getCenterPoint({x: p.x, y: p.y});
-        //const cube = canvas.grid.getCube(coords);
-        //const offset = canvas.grid.getOffset(cube);
-        const offset = {x: p.x, y: p.y};
-        return canvas.grid.getTopLeftPoint(offset);
+    static _getTopLeftPoint(x, y){
+        return canvas.grid.grid.getTopLeft(x, y);
     }
 
     static toggleHighlightWall(wall, on, layername){
@@ -17,64 +13,73 @@ export default class WallHelpers
             console.log(layername);
         }
 
+        let layer = canvas.grid.addHighlightLayer(layername);
         let positions = WallHelpers._getAdjacentWallGridOffsets(wall);
 
         if(on)
         {
             positions.forEach(p => {
-                canvas.interface.grid.highlightPosition(layername, { x:p[0], y:p[1] });
+                canvas.grid.grid.highlightGridPosition(layer, { x:p[0], y:p[1] });
             });
         }
         else
         {
-            canvas.interface.grid.destroyHighlightLayer(layername);
+            canvas.grid.clearHighlightLayer(layername);
         }
     }
     
     static _getAdjacentWallGridOffsets(wall)
-    {
-        if (drawing.document.documentName != "Wall")
-            return [];
-        
+    {                
         if(game.settings.get('impmal-cover-walls','debug')){
             console.log("calculating adjacent positions...\n");
         }
         const points = wall.coords;
-        const vector = {x:points[0]-points[2], y:points[1]-points[3]}
-        const m = vector.y/vector.x
+        const vector = [points[0]-points[2], points[1]-points[3]]
+        const m = vector[1]/vector[0]
         const get_y = (x) => x*m - points[0]*m + points[1];        
         const get_x = (y) => (y - points[1])/m + points[0];
 
         const grid_size = canvas.grid.size;
-        const vector_sideways = {x: -1*(vector.x*grid_size/2)/Math.max(vector.x, vector.y), y:(vector.y*grid_size/2)/Math.max(vector.x, vector.y)}
-        const p1 = _getTopLeftPoint({x:points[0], y:points[1]});
-        const p2 = _getTopLeftPoint({x:points[2], y:points[3]});
+        const vector_sideways = [-1*(vector[0]*grid_size/2)/Math.max(vector[0], vector[1]), (vector[1]*grid_size/2)/Math.max(vector[0], vector[1])];
+        const p1 = this._getTopLeftPoint(points[0], points[1]);
+        const p2 = this._getTopLeftPoint(points[2], points[3]);
 
         let result = [p1, p2];
         
-        const max_x = Math.max(p1.x, p2.x);
+        const max_x = Math.max(p1[0], p2[0]);
         // iterate over x
-        for (let x = Math.min(p1.x, p2.x); x < max_x; x+=grid_size) {
+        for (let x = Math.min(p1[0], p2[0]); x < max_x; x+=grid_size) {
             const y = get_y(x);
-            result.push(_getTopLeftPoint({x:x+vector_sideways.x, y:y+vector_sideways.y}));
-            result.push(_getTopLeftPoint({x:x-vector_sideways.x, y:y-vector_sideways.y}));
-            result.push(_getTopLeftPoint({x:x, y:y}));
+            const variant1 = this._getTopLeftPoint(x+vector_sideways[0], y+vector_sideways[1]);
+            if (result.find(p => p[0] == variant1[0] && p[0] == variant1[0]) == undefined)
+                result.push(variant1);
+            const variant2 = this._getTopLeftPoint(x-vector_sideways[0], y-vector_sideways[1]);
+            if (result.find(p => p[0] == variant2[0] && p[1] == variant2[1]) == undefined)
+                result.push(variant2);            
+            const point = this._getTopLeftPoint(x, y);
+            if (result.find(p => p[0] == point[0] && p[1] == point[1]) == undefined)
+                result.push(point);            
         }
         
-        const max_y = Math.max(p1.y, p2.y);
+        const max_y = Math.max(p1[1], p2[1]);
         // iterate over y
-        for (let y = Math.min(p1.y, p2.y); y < max_y; y+=grid_size) {
+        for (let y = Math.min(p1[1], p2[1]); y < max_y; y+=grid_size) {
             const x = get_x(y);
-            result.push(_getTopLeftPoint({x:x+vector_sideways.x, y:y+vector_sideways.y}));
-            result.push(_getTopLeftPoint({x:x-vector_sideways.x, y:y-vector_sideways.y}));
-            result.push(_getTopLeftPoint({x:x, y:y}));
+            const variant1 = this._getTopLeftPoint(x+vector_sideways[0], y+vector_sideways[1]);
+            if (result.find(p => p[0] == variant1[0] && p[0] == variant1[0]) == undefined)
+                result.push(variant1);
+            const variant2 = this._getTopLeftPoint(x-vector_sideways[0], y-vector_sideways[1]);
+            if (result.find(p => p[0] == variant2[0] && p[1] == variant2[1]) == undefined)
+                result.push(variant2);            
+            const point = this._getTopLeftPoint(x, y);
+            if (result.find(p => p[0] == point[0] && p[1] == point[1]) == undefined)
+                result.push(point);            
         }
-        const set = [...new Set(result)];
+
         if(game.settings.get('impmal-cover-walls','debug')){
             console.log(result);
-            console.log(set);
         }
-        return set;
+        return result;
     }
 
     /**
@@ -93,12 +98,23 @@ export default class WallHelpers
         }
 
         if (update.x || update.y)
-        {
-            let preX = {x : token.object.center.x, y: token.object.center.y};
-            let postX = {
-                x :(update.x || token.x) + canvas.grid.size / 2 , 
-                y: (update.y || token.y) + canvas.grid.size / 2
-            };
+        {            
+            let preX = [ token.object.center.x, token.object.center.y];
+            let postX = [(update.x || token.x) + canvas.grid.size / 2 , 
+                (update.y || token.y) + canvas.grid.size / 2];
+            
+            if(game.settings.get('impmal-cover-walls','debug')){
+                console.log(token);
+                console.log(preX);
+                console.log(postX);
+            }
+            preX = this._getTopLeftPoint(preX[0], preX[1]);
+            postX = this._getTopLeftPoint(postX[0], postX[1]);
+            
+            if(game.settings.get('impmal-cover-walls','debug')){
+                console.log(preX);
+                console.log(postX);
+            }
 
             let toAdd = [];
             let toRemove = [];
@@ -106,15 +122,16 @@ export default class WallHelpers
             let currentZoneEffects = token.actor?.currentZoneEffects || [];
 
             let entered = [];
-            let left = [];
+            let left = [];            
+
             for (let drawing of drawings)
             {
-                if (drawing.document.documentName != "Wall" || !drawing.document.flags?.impmal?.traits)
+                if (!drawing.document.flags?.impmal?.traits)
                     continue;
 
                 const adjacent_points = this._getAdjacentWallGridOffsets(drawing);
-                const post_is_adjacent = adjacent_points.includes(this._getTopLeftPoint(postX));
-                const pre_is_adjacent = adjacent_points.includes(this._getTopLeftPoint(preX));
+                const post_is_adjacent = adjacent_points.find(p => p[0] == postX[0] && p[1] == postX[1]) != undefined;
+                const pre_is_adjacent = adjacent_points.find(p => p[0] == preX[0] && p[1] == preX[1]) != undefined;
 
                 if (post_is_adjacent && !pre_is_adjacent) // If entering Wall Zone
                 {
@@ -125,6 +142,12 @@ export default class WallHelpers
                     left.push(drawing);
                 }
             }
+
+            if(game.settings.get('impmal-cover-walls','debug')){
+                console.log(`left: ${left}`);
+                console.log(`entered: ${entered}`);
+            }
+            
 
             // Take the drawings the token left, filter through the actor's zone effects to find the ones from those drawings, mark those for removal
             // Note that some effects are denoted as "kept" and are not removed upon leaving the zone
