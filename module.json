@@ -8,12 +8,12 @@
           "email": "captaincat612@gmail.com"
       }
   ],
-  "version": "0.3.0",
+  "version": "0.4.0",
   "compatibility":{
       "minimum": 11,
       "verified": 11
   },
-  "esmodules": ["./cover-walls.js"],
+  "scripts": ["./cover-walls.js"],
   "languages": [
     {
       "lang": "en",
