@@ -4,6 +4,6 @@ export default function()
 {
     Hooks.on("preUpdateToken", async (token, data) => 
     {
-        WallHelpers.checkTokenUpdate(token, data, canvas.drawings.placeables);
+        WallHelpers.checkTokenUpdate(token, data, canvas.walls.placeables);
     });
 }
