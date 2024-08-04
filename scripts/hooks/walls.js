@@ -2,44 +2,17 @@ import WallHelpers from "../wall-helpers.js";
 
 export default function() 
 {
-    if(game.settings.get('impmal-cover-walls','highlight')){
-        Hooks.on("hoverWall", async (wall, hover) => 
-        {
-            let positions = WallHelpers._getAdjacentWallGridOffsets(wall);
-            
-            if(game.settings.get('impmal-cover-walls','debug'))
-                console.log(positions);
-            if(hover)
-            {
-                positions.forEach(p => {
-                    canvas.interface.grid.highlightPosition("impmal-cover-walls.hoverWall", { x:p[0], y:p[1] });
-                });
-            }
-            else
-            {
-                canvas.interface.grid.destroyHighlightLayer("impmal-cover-walls.hoverWall");
-            }
-        });
+    Hooks.on("hoverWall", async (wall, hover) => 
+    {
+        if(game.settings.get('impmal-cover-walls','highlight'))
+            WallHelpers.toggleHighlightWall(wall, hover, "impmal-cover-walls.hoverWall");
+    });
 
-        Hooks.on("controlWall", async (wall, hover) => 
-        {
-            let positions = WallHelpers._getAdjacentWallGridOffsets(wall);  
-            
-            if(game.settings.get('impmal-cover-walls','debug'))          
-                console.log(positions);
-            
-            if(hover)
-            {
-                positions.forEach(p => {
-                    canvas.interface.grid.highlightPosition("impmal-cover-walls.controlWall", { x:p[0], y:p[1] });
-                });
-            }
-            else
-            {
-                canvas.interface.grid.destroyHighlightLayer("impmal-cover-walls.controlWall");
-            }
-        });
-    }  
+    Hooks.on("controlWall", async (wall, hover) => 
+    {
+        if(game.settings.get('impmal-cover-walls','highlight'))
+            WallHelpers.toggleHighlightWall(wall, hover, "impmal-cover-walls.controlWall");
+    });
     
     Hooks.on("renderWallConfig", async (app, [html], style) => 
     {
@@ -65,6 +38,6 @@ export default function()
                 </select>
             </div>
         </div>`;
-        html.querySelector('.window-content .form-footer').insertAdjacentHTML('beforebegin', extra_html)
+        html.querySelector('.form-footer ').insertAdjacentHTML('beforebegin', extra_html)
     });
 }

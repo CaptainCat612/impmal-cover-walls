@@ -7,12 +7,38 @@ export default class WallHelpers
         const offset = {x: p.x, y: p.y};
         return canvas.grid.getTopLeftPoint(offset);
     }
+
+    static toggleHighlightWall(wall, on, layername){
+        
+        if(game.settings.get('impmal-cover-walls','debug')){
+            console.log("toogleHighlightWall called with:\n");
+            console.log(wall);
+            console.log(on);
+            console.log(layername);
+        }
+        
+        let positions = WallHelpers._getAdjacentWallGridOffsets(wall);
+
+        if(on)
+        {
+            positions.forEach(p => {
+                canvas.interface.grid.highlightPosition(layername, { x:p[0], y:p[1] });
+            });
+        }
+        else
+        {
+            canvas.interface.grid.destroyHighlightLayer(layername);
+        }
+    }
     
     static _getAdjacentWallGridOffsets(wall)
     {
         if (!(drawing instanceof Wall))
             return [];
         
+        if(game.settings.get('impmal-cover-walls','debug')){
+            console.log("calculating adjacent positions...\n");
+        }
         const points = wall.coords;
         const vector = {x:points[0]-points[2], y:points[1]-points[3]}
         const m = vector.y/vector.x
@@ -43,7 +69,12 @@ export default class WallHelpers
             result.push(_getTopLeftPoint({x:x-vector_sideways.x, y:y-vector_sideways.y}));
             result.push(_getTopLeftPoint({x:x, y:y}));
         }
-        return [...new Set(result)];
+        const set = [...new Set(result)];
+        if(game.settings.get('impmal-cover-walls','debug')){
+            console.log(result);
+            console.log(set);
+        }
+        return set;
     }
 
     /**
