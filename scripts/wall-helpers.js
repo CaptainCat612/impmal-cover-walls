@@ -81,7 +81,7 @@ export default class WallHelpers
 
         
         const size = canvas.grid.size/2;
-        sideways = [sideways[0]*size, sideways[1]*size];
+        sideways = [Math.round(sideways[0]*size), Math.round(sideways[1]*size)];
         return sideways;
     }
 
