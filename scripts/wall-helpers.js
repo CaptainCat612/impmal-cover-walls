@@ -27,58 +27,92 @@ export default class WallHelpers
             canvas.grid.clearHighlightLayer(layername);
         }
     }
+
+    static _filterDuplicates(posList){
+        return posList.filter((pos, index) =>
+            posList.findIndex(p => p[0] ==pos[0] && p[1] == pos[1]) == index);
+    }
     
+    static _getLineCandidates(point1, point2)
+    {
+        const vector = [point1[0]-point2[0], point1[1]-point2[1]];
+        const m = vector[1]/vector[0];
+        const get_y = (x) => x*m - point1[0]*m + point1[1];        
+        const get_x = (y) => (y - point1[1])/m + point1[0];
+
+        const grid_size = canvas.grid.size;
+        const p1 = this._getTopLeftPoint(point1[0], point1[1]);
+        const p2 = this._getTopLeftPoint(point2[0], point2[1]);
+        
+        let candidates = [];
+        const max_x = Math.max(p1[0], p2[0]);
+        // iterate over x
+        for (let x = Math.min(p1[0], p2[0])+grid_size; x < max_x; x+=grid_size) {
+            const y = get_y(x);     
+            candidates.push([x,y]);            
+        }
+        
+        const max_y = Math.max(p1[1], p2[1]);
+        // iterate over y
+        for (let y = Math.min(p1[1], p2[1])+grid_size; y < max_y; y+=grid_size) {
+            const x = get_x(y); 
+            candidates.push([x,y]);           
+        }
+
+        if(game.settings.get('impmal-cover-walls','debug')){
+            console.log("Candidates for Line:");
+            console.log(candidates);
+        }
+        return this._filterDuplicates(candidates);
+    }
+
+    static _getSidewaysVector(point1, point2){
+        
+        let sideways = [point2[0]-point1[0], point2[1]- point1[1]];
+        
+        const length = Math.sqrt(Math.pow(sideways[0],2) + Math.pow(sideways[1],2));
+        sideways = [sideways[0]/length, sideways[1]/length];
+        
+        const radians = 90* Math.PI/180;
+        sideways = [
+            sideways[0]*Math.cos(radians)-sideways[1]*Math.sin(radians), 
+            sideways[0]*Math.sin(radians)+sideways[1]*Math.cos(radians)
+        ];
+
+        
+        const size = canvas.grid.size/2;
+        sideways = [sideways[0]*size, sideways[1]*size];
+        return sideways;
+    }
+
     static _getAdjacentWallGridOffsets(wall)
     {                
         if(game.settings.get('impmal-cover-walls','debug')){
             console.log("calculating adjacent positions...\n");
         }
-        const points = wall.coords;
-        const vector = [points[0]-points[2], points[1]-points[3]]
-        const m = vector[1]/vector[0]
-        const get_y = (x) => x*m - points[0]*m + points[1];        
-        const get_x = (y) => (y - points[1])/m + points[0];
+        const point1 = [wall.coords[0], wall.coords[1]];        
+        const point2 = [wall.coords[2], wall.coords[3]];
 
-        const grid_size = canvas.grid.size;
-        const vector_sideways = [-1*(vector[0]*grid_size/2)/Math.max(vector[0], vector[1]), (vector[1]*grid_size/2)/Math.max(vector[0], vector[1])];
-        const p1 = this._getTopLeftPoint(points[0], points[1]);
-        const p2 = this._getTopLeftPoint(points[2], points[3]);
+        const sideways = this._getSidewaysVector(point1, point2);
+        const candidates = [
+            ...this._getLineCandidates(point1, point2),
+            [point1[0]- sideways[0], point1[1]- sideways[1]],
+            [point2[0]- sideways[0], point2[1]- sideways[1]],
+            ...this._getLineCandidates([point1[0]- sideways[0], point1[1]- sideways[1]],
+                [point2[0]- sideways[0], point2[1]- sideways[1]]),
+            [point1[0]+ sideways[0], point1[1]+ sideways[1]],
+            [point2[0]+ sideways[0], point2[1]+ sideways[1]],
+            ...this._getLineCandidates([point1[0]+ sideways[0], point1[1]+ sideways[1]],
+                    [point2[0]+ sideways[0], point2[1]+ sideways[1]])
+        ];
 
-        let result = [p1, p2];
-        
-        const max_x = Math.max(p1[0], p2[0]);
-        // iterate over x
-        for (let x = Math.min(p1[0], p2[0]); x < max_x; x+=grid_size) {
-            const y = get_y(x);
-            const variant1 = this._getTopLeftPoint(x+vector_sideways[0], y+vector_sideways[1]);
-            if (result.find(p => p[0] == variant1[0] && p[0] == variant1[0]) == undefined)
-                result.push(variant1);
-            const variant2 = this._getTopLeftPoint(x-vector_sideways[0], y-vector_sideways[1]);
-            if (result.find(p => p[0] == variant2[0] && p[1] == variant2[1]) == undefined)
-                result.push(variant2);            
-            const point = this._getTopLeftPoint(x, y);
-            if (result.find(p => p[0] == point[0] && p[1] == point[1]) == undefined)
-                result.push(point);            
-        }
-        
-        const max_y = Math.max(p1[1], p2[1]);
-        // iterate over y
-        for (let y = Math.min(p1[1], p2[1]); y < max_y; y+=grid_size) {
-            const x = get_x(y);
-            const variant1 = this._getTopLeftPoint(x+vector_sideways[0], y+vector_sideways[1]);
-            if (result.find(p => p[0] == variant1[0] && p[0] == variant1[0]) == undefined)
-                result.push(variant1);
-            const variant2 = this._getTopLeftPoint(x-vector_sideways[0], y-vector_sideways[1]);
-            if (result.find(p => p[0] == variant2[0] && p[1] == variant2[1]) == undefined)
-                result.push(variant2);            
-            const point = this._getTopLeftPoint(x, y);
-            if (result.find(p => p[0] == point[0] && p[1] == point[1]) == undefined)
-                result.push(point);            
-        }
+        let result = candidates.map(pos => this._getTopLeftPoint(pos[0], pos[1]));
+        const p1 = this._getTopLeftPoint(point1[0], point1[1]);
+        const p2 = this._getTopLeftPoint(point2[0], point2[1]);
+        const maxP = (p1[0] >= p2[0] && p1[1] >= p2[1])? p1 : p2;
 
-        if(game.settings.get('impmal-cover-walls','debug')){
-            console.log(result);
-        }
+        result = this._filterDuplicates(result);
+        result = result.filter(pos => pos[0] <= maxP[0] | pos[1] <= maxP[0]);
         return result;
     }
 
